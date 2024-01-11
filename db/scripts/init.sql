@@ -1,0 +1,4 @@
+\i table/role.sql
+\i table/account.sql
+\i table/document.sql
+\i seed/role.sql

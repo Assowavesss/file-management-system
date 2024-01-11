@@ -1,0 +1,17 @@
+# git repo
+.git
+.gitignore
+.gitmodule
+.vscode
+
+# vim
+*~
+*.swp
+*.swo
+*.swn
+
+# log files
+*.bak
+*.log
+*.sqlproj
+*.psql       

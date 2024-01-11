@@ -1,3 +1,41 @@
 {
-  "extends": "next/core-web-vitals"
+  "env": {
+    "es2023": true,
+    "browser": true
+  },
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:tailwindcss/recommended",
+    "prettier",
+    "plugin:prettier/recommended",
+    "plugin:import/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "react-hooks", "simple-import-sort"],
+  "overrides": [
+    {
+      "files": ["src/lib/**/*.tsx"],
+      "rules": {
+        "@next/next/no-img-element": "off"
+      }
+    }
+  ],
+  "root": true,
+  "rules": {
+    "react/display-name": "off",
+    "jsx-a11y/alt-text": "off",
+    "prettier/prettier": ["error", { "endOfLine": "auto" }]
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": ["./tsconfig.json"]
+      }
+    },
+    "tailwindcss": {
+      "config": "./tailwind.config.js"
+    }
+  }
 }

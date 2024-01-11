@@ -1,0 +1,23 @@
+{
+  "name": "account-service",
+  "version": "1.0",
+  "description": "Account service",
+  "dependencies": [
+    "jsoncpp",
+    "zlib",
+    "openssl",
+    "libpq",
+    "libpqxx",
+    {
+      "name": "drogon",
+      "features": [
+        "ctl",
+        "postgres",
+        "redis",
+        "orm"
+      ]
+    },
+    "jwt-cpp"
+  ],
+  "builtin-baseline": "8eb57355a4ffb410a2e94c07b4dca2dffbee8e50"
+}

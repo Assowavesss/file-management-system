@@ -1,3 +1,9 @@
+import SignInForm from '@/components/SignInForm';
+
 export default function Home() {
-  return <p className='bg-white'>coucou</p>;
+  return (
+    <div className='flex h-screen items-center justify-center'>
+      <SignInForm />;
+    </div>
+  );
 }

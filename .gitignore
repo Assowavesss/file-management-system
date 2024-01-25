@@ -1,0 +1,10 @@
+*.bak
+*.log
+*.sqlproj
+*.psql
+.DS_Store
+# vim
+*~
+*.swp
+*.swo
+*.swn

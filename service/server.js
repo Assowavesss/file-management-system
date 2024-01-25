@@ -15,16 +15,16 @@ const internshipRoutes = require('./routes/internship.routes');
 const documentRoutes = require('./routes/document.routes');
 
 const app = express();
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  optionsSuccessStatus: 200,
-};
+// const corsOptions = {
+//   origin: 'http://localhost:3000',
+//   optionsSuccessStatus: 200,
+// };
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(helmet());
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.json({

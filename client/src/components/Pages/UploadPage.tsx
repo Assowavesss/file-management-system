@@ -22,6 +22,7 @@ import {
   IconButton,
   SelectChangeEvent,
 } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme();
@@ -32,25 +33,21 @@ export default function FileUpload() {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
-  const [allFiles, setAllFiles] = useState<string[]>([]);
   const [showAllFiles, setShowAllFiles] = useState<boolean>(false);
-  const [documentType1Files, setDocumentType1Files] = useState<string[]>([]);
-  const [documentType2Files, setDocumentType2Files] = useState<string[]>([]);
 
   useEffect(() => {
-    // Charger la liste des fichiers téléchargés au chargement de la page
-    loadUploadedFiles();
+    loadFiles();
   }, []);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files ? e.target.files[0] : null;
-    console.log('Selected file:', selectedFile); // Affichez le fichier sélectionné
-    setFile(selectedFile); // Prendre le premier fichier
+    setFile(selectedFile);
   };
 
   const handleDocumentTypeChange = (e: SelectChangeEvent<string>) => {
-    setDocumentType(e.target.value as string); // Mettre à jour le documentType
+    setDocumentType(e.target.value);
   };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!file || !documentType) {
@@ -58,29 +55,44 @@ export default function FileUpload() {
       setOpenSnackbar(true);
       return;
     }
-    console.log('Uploading file:', file.name);
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('documentType', documentType);
-    console.log('File in FormData:', formData.get('file')); // Vérifiez le fichier dans FormData
-    console.log('Document Type in FormData:', formData.get('documentType')); // Ajouter le type de document
 
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/v1/upload',
-        formData
-      );
-      console.log(response.data);
+      await axios.post('http://localhost:8080/api/v1/upload', formData);
       setSnackbarMessage('File uploaded successfully!');
       setOpenSnackbar(true);
-      // Rechargez la liste des fichiers téléchargés après le téléchargement
-      loadUploadedFiles();
-    } catch (error: any) {
+      loadFiles();
+    } catch (error) {
+      let errorMessage = 'Failed to upload file.';
+
+      if (axios.isAxiosError(error)) {
+        // Now TypeScript knows that 'error' is an AxiosError
+        const axiosError = error;
+
+        // Check if axiosError.response and axiosError.response.data exist
+        if (axiosError.response && axiosError.response.data) {
+          if (typeof axiosError.response.data === 'string') {
+            // Response data is a string
+            errorMessage = axiosError.response.data;
+          } else if (
+            typeof axiosError.response.data === 'object' &&
+            axiosError.response.data.message
+          ) {
+            // Response data is an object with a 'message' property
+            errorMessage = axiosError.response.data.message;
+          }
+        }
+      } else {
+        // Handle non-Axios errors here
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+      }
+
       console.error('Error during file upload:', error);
-      const errorMessage =
-        error.response && error.response.data
-          ? error.response.data
-          : 'Failed to upload file.';
       setSnackbarMessage(errorMessage);
       setOpenSnackbar(true);
     }
@@ -96,57 +108,32 @@ export default function FileUpload() {
     setOpenSnackbar(false);
   };
 
-  const loadUploadedFiles = async () => {
+  const loadFiles = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/v1/allfiles');
-      console.log('Response from loadUploadedFiles:', response.data);
-      // Puisque la réponse est déjà un tableau de chaînes (noms de fichiers), vous pouvez le définir directement
+      const response = await axios.get('http://localhost:8080/api/v1/files');
       setUploadedFiles(response.data);
-      // Séparez les fichiers par document type
-      const type1Files = response.data.filter((fileName: string) =>
-        fileName.includes('CahierDesCharges')
-      );
-      const type2Files = response.data.filter((fileName: string) =>
-        fileName.includes('RapportDeStage')
-      );
-      setDocumentType1Files(type1Files);
-      setDocumentType2Files(type2Files);
-    } catch (error: any) {
-      console.error('Error loading uploaded files:', error);
+    } catch (error) {
+      console.error('Error loading files:', error);
     }
   };
 
   const handleDownload = async (fileName: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/v1/download/${fileName}`,
+        `http://localhost:8080/api/v1/files/download/${fileName}`,
         {
           responseType: 'blob',
         }
       );
       saveAs(response.data, fileName);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error during file download:', error);
-      // Affichez un message d'erreur ou gérez l'erreur comme vous le souhaitez
+      // You may want to display an error message to the user here.
     }
   };
 
   const handleShowAllFiles = () => {
     setShowAllFiles(!showAllFiles);
-    if (!showAllFiles) {
-      loadAllFiles();
-    }
-  };
-
-  const loadAllFiles = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/v1/allfiles');
-      setAllFiles(
-        response.data.map((file: { fileName: string }) => file.fileName)
-      ); // Utilisez le nom d'origine
-    } catch (error: any) {
-      console.error('Error loading all files:', error);
-    }
   };
 
   return (
@@ -176,7 +163,12 @@ export default function FileUpload() {
           >
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <input type="file" onChange={handleFileChange} />
+                <input
+                  accept="*/*"
+                  type="file"
+                  onChange={handleFileChange}
+                  style={{ display: 'block', margin: '20px auto' }}
+                />
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth margin="normal">
@@ -197,20 +189,20 @@ export default function FileUpload() {
                   </Select>
                 </FormControl>
               </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  borderRadius: 2,
+                  backgroundColor: '#CBB780FF',
+                }}
+              >
+                Upload File
+              </Button>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{
-                mt: 3,
-                mb: 2,
-                borderRadius: 2,
-                backgroundColor: '#CBB780FF',
-              }}
-            >
-              Upload File
-            </Button>
           </Box>
         </Paper>
         <Snackbar
@@ -228,45 +220,23 @@ export default function FileUpload() {
             {snackbarMessage}
           </Alert>
         </Snackbar>
-        <Typography variant="h6" style={{ marginTop: '20px' }}>
+        <Typography
+          variant="h6"
+          style={{ marginTop: '20px', marginBottom: '10px' }}
+        >
           List of Uploaded Files:
         </Typography>
-        {uploadedFiles.map((fileName, index) => (
-          <Paper
-            key={index}
-            variant="outlined"
-            style={{ marginTop: '10px', padding: '10px' }}
-          >
-            <Grid container alignItems="center">
-              <Grid item xs={8}>
-                <Typography variant="body1">{fileName}</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => handleDownload(fileName)}
-                >
-                  Download
-                </Button>
-              </Grid>
-            </Grid>
-          </Paper>
-        ))}
-        <Typography variant="h6" style={{ marginTop: '20px' }}>
-          List of All Files:
-        </Typography>
         <List>
-          {allFiles.map((fileName, index) => (
+          {uploadedFiles.map((fileName, index) => (
             <ListItem key={index}>
               <ListItemText primary={fileName} />
               <ListItemSecondaryAction>
                 <IconButton
                   edge="end"
-                  aria-label="Download"
+                  aria-label="download"
                   onClick={() => handleDownload(fileName)}
                 >
-                  <i className="fa fa-download" />
+                  <DownloadIcon />
                 </IconButton>
               </ListItemSecondaryAction>
             </ListItem>
@@ -277,52 +247,15 @@ export default function FileUpload() {
           color="primary"
           fullWidth
           onClick={handleShowAllFiles}
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, mb: 2 }}
         >
           {showAllFiles ? 'Hide All Files' : 'Show All Files'}
         </Button>
         {showAllFiles && (
           <>
-            <Divider sx={{ mt: 2, mb: 2 }} />
-            <Typography variant="h6">Separated by Document Type:</Typography>
-            <Typography variant="h6" style={{ marginTop: '20px' }}>
-              Document Type 1 Files:
-            </Typography>
-            <List>
-              {documentType1Files.map((fileName, index) => (
-                <ListItem key={index}>
-                  <ListItemText primary={fileName} />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      aria-label="Download"
-                      onClick={() => handleDownload(fileName)}
-                    >
-                      <i className="fa fa-download" />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-            </List>
-            <Typography variant="h6" style={{ marginTop: '20px' }}>
-              Document Type 2 Files:
-            </Typography>
-            <List>
-              {documentType2Files.map((fileName, index) => (
-                <ListItem key={index}>
-                  <ListItemText primary={fileName} />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      aria-label="Download"
-                      onClick={() => handleDownload(fileName)}
-                    >
-                      <i className="fa fa-download" />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-            </List>
+            <Divider sx={{ my: 2 }} />
+            {/* Assuming there is a separate list or some other content to show when 'showAllFiles' is true */}
+            {/* Add that content here */}
           </>
         )}
       </Container>

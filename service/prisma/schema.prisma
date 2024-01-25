@@ -1,5 +1,6 @@
+// schema.prisma
 datasource db {
-  provider = "mysql" // Ou "mysql", "sqlite", "sqlserver" selon votre base de données
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -9,12 +10,11 @@ generator client {
 
 model User {
   id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
   firstName String
   lastName  String
+  password  String
   email     String   @unique
-  admin     Admin?
+  admin     Admin? // Suppression de @unique, car un utilisateur peut être lié à un admin, un étudiant ou un tuteur
   student   Student?
   tutor     Tutor?
 }
@@ -34,9 +34,9 @@ model Student {
   userId            Int              @unique
   internships       Internship[]
   evaluations       Evaluation[]
-  AcademicTutor     AcademicTutor?   @relation(fields: [academicTutorId], references: [id])
+  academicTutor     AcademicTutor?   @relation(fields: [academicTutorId], references: [id])
   academicTutorId   Int?
-  EnterpriseTutor   EnterpriseTutor? @relation(fields: [enterpriseTutorId], references: [id])
+  enterpriseTutor   EnterpriseTutor? @relation(fields: [enterpriseTutorId], references: [id])
   enterpriseTutorId Int?
 }
 
@@ -66,7 +66,7 @@ model EnterpriseTutor {
 model Company {
   id          Int          @id @default(autoincrement())
   name        String
-  adress      String
+  address     String
   city        String?
   email       String       @unique
   internships Internship[]
@@ -76,39 +76,38 @@ model Internship {
   id          Int          @id @default(autoincrement())
   title       String
   date        DateTime
-  // student     Student      @relation(fields: [studentId], references: [id])
-  // studentId   Int
-  company     Company      @relation(fields: [companyId], references: [id])
   companyId   Int
   evaluations Evaluation[]
+  studentId   Int? // Le lien avec l'étudiant est facultatif
   Student     Student?     @relation(fields: [studentId], references: [id])
-  studentId   Int?
+  Company     Company      @relation(fields: [companyId], references: [id])
 }
 
 model Document {
-  id                     Int      @id @default(autoincrement())
-  documentName           String
-  levelOfConfidentiality Int
-  // Ajouter des relations avec Report, CdC si nécessaire
-  CdC                    CdC[]
-  Report                 Report[]
+  id           String   @id @default(dbgenerated("UUID()")) @map("id")
+  fileName     String   @default("") @db.VarChar(255)
+  filePath     String   @default("") @db.VarChar(255)
+  fileType     String   @default("") @db.VarChar(255)
+  fileSize     Int?
+  documentType String   @default("") @db.VarChar(50)
+  CdC          CdC[]
+  Report       Report[]
+  // ... autres champs communs
 }
 
 model CdC {
   id         Int      @id @default(autoincrement())
   file       String
-  documentId Int
+  documentId String // Le type doit correspondre à Document
   document   Document @relation(fields: [documentId], references: [id])
-
   // ...
 }
 
 model Report {
   id         Int      @id @default(autoincrement())
   file       String
-  documentId Int
+  documentId String // Le type doit correspondre à Document
   document   Document @relation(fields: [documentId], references: [id])
-
   // ...
 }
 
@@ -117,13 +116,13 @@ model Evaluation {
   evaluation       String
   submissionDate   DateTime
   factor           Int
-  internship       Internship          @relation(fields: [internshipId], references: [id])
   internshipId     Int
+  studentId        Int? // L'étudiant est facultatif
+  ReportEvaluation ReportEvaluation[]
   studentEvals     StudentEvaluation[]
   companyEvals     CompanyEvaluation[]
   Student          Student?            @relation(fields: [studentId], references: [id])
-  studentId        Int?
-  ReportEvaluation ReportEvaluation[]
+  Internship       Internship          @relation(fields: [internshipId], references: [id])
 }
 
 model StudentEvaluation {

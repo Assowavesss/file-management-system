@@ -33,7 +33,7 @@ export default function RegisterForm() {
       email: email,
       password: data.get('password') as string,
     };
-
+    console.log(user);
     axios
       .post('http://localhost:8080/api/v1/register', user)
       .then((response) => {
@@ -45,6 +45,7 @@ export default function RegisterForm() {
         console.error('Error during registration:', error);
         setEmailError(false);
       });
+    console.log(user);
   };
 
   const handleCloseSnackbar = (

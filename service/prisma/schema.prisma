@@ -1,0 +1,159 @@
+datasource db {
+  provider = "mysql" // Ou "mysql", "sqlite", "sqlserver" selon votre base de données
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  firstName String
+  lastName  String
+  email     String   @unique
+  admin     Admin?
+  student   Student?
+  tutor     Tutor?
+}
+
+model Admin {
+  id      Int    @id @default(autoincrement())
+  adminId String @unique
+  user    User   @relation(fields: [userId], references: [id])
+  userId  Int    @unique
+}
+
+model Student {
+  id                Int              @id @default(autoincrement())
+  studentId         String           @unique
+  promotion         String
+  user              User             @relation(fields: [userId], references: [id])
+  userId            Int              @unique
+  internships       Internship[]
+  evaluations       Evaluation[]
+  AcademicTutor     AcademicTutor?   @relation(fields: [academicTutorId], references: [id])
+  academicTutorId   Int?
+  EnterpriseTutor   EnterpriseTutor? @relation(fields: [enterpriseTutorId], references: [id])
+  enterpriseTutorId Int?
+}
+
+model Tutor {
+  id               Int               @id @default(autoincrement())
+  tutorId          String            @unique
+  user             User              @relation(fields: [userId], references: [id])
+  userId           Int               @unique
+  academicTutors   AcademicTutor[]
+  enterpriseTutors EnterpriseTutor[]
+}
+
+model AcademicTutor {
+  id       Int       @id @default(autoincrement())
+  tutor    Tutor     @relation(fields: [tutorId], references: [id])
+  tutorId  Int
+  students Student[]
+}
+
+model EnterpriseTutor {
+  id       Int       @id @default(autoincrement())
+  tutor    Tutor     @relation(fields: [tutorId], references: [id])
+  tutorId  Int
+  students Student[]
+}
+
+model Company {
+  id          Int          @id @default(autoincrement())
+  name        String
+  adress      String
+  city        String?
+  email       String       @unique
+  internships Internship[]
+}
+
+model Internship {
+  id          Int          @id @default(autoincrement())
+  title       String
+  date        DateTime
+  // student     Student      @relation(fields: [studentId], references: [id])
+  // studentId   Int
+  company     Company      @relation(fields: [companyId], references: [id])
+  companyId   Int
+  evaluations Evaluation[]
+  Student     Student?     @relation(fields: [studentId], references: [id])
+  studentId   Int?
+}
+
+model Document {
+  id                     Int      @id @default(autoincrement())
+  documentName           String
+  levelOfConfidentiality Int
+  // Ajouter des relations avec Report, CdC si nécessaire
+  CdC                    CdC[]
+  Report                 Report[]
+}
+
+model CdC {
+  id         Int      @id @default(autoincrement())
+  file       String
+  documentId Int
+  document   Document @relation(fields: [documentId], references: [id])
+
+  // ...
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  file       String
+  documentId Int
+  document   Document @relation(fields: [documentId], references: [id])
+
+  // ...
+}
+
+model Evaluation {
+  id               Int                 @id @default(autoincrement())
+  evaluation       String
+  submissionDate   DateTime
+  factor           Int
+  internship       Internship          @relation(fields: [internshipId], references: [id])
+  internshipId     Int
+  studentEvals     StudentEvaluation[]
+  companyEvals     CompanyEvaluation[]
+  Student          Student?            @relation(fields: [studentId], references: [id])
+  studentId        Int?
+  ReportEvaluation ReportEvaluation[]
+}
+
+model StudentEvaluation {
+  id           Int        @id @default(autoincrement())
+  evaluationId Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+}
+
+model CompanyEvaluation {
+  id           Int        @id @default(autoincrement())
+  evaluationId Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+}
+
+model Soutenance {
+  id          Int                    @id @default(autoincrement())
+  date        DateTime
+  status      String
+  evaluations SoutenanceEvaluation[]
+}
+
+model SoutenanceEvaluation {
+  id           Int        @id @default(autoincrement())
+  soutenanceId Int
+  soutenance   Soutenance @relation(fields: [soutenanceId], references: [id])
+}
+
+model ReportEvaluation {
+  id           Int        @id @default(autoincrement())
+  reportEvalId Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+  evaluationId Int
+}

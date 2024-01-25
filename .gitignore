@@ -2,7 +2,7 @@
 *.log
 *.sqlproj
 *.psql
-
+.DS_Store
 # vim
 *~
 *.swp

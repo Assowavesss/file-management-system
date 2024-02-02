@@ -1,4 +1,10 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, {
+  useEffect,
+  useState,
+  ChangeEvent,
+  FormEvent,
+  useContext,
+} from 'react';
 import axios from 'axios';
 import {
   Button,
@@ -14,6 +20,8 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { NavLink } from 'react-router-dom';
 
+import { UserContext } from '../../../UserContext';
+
 const theme = createTheme();
 
 interface LoginData {
@@ -21,11 +29,20 @@ interface LoginData {
   password: string;
 }
 
-export default function Login() {
+interface UserData {
+  token: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
+export default function LoginPage() {
+  const { user, handleLogin, handleUserLogout } = useContext(UserContext);
   const [loginData, setLoginData] = useState<LoginData>({
     email: '',
     password: '',
   });
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -36,18 +53,36 @@ export default function Login() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const response = await axios.post<UserData>(
         'http://localhost:8080/api/v1/login',
         loginData
       );
-      console.log(response.data);
-      // Handle the response here
+
+      localStorage.setItem('userToken', response.data.token);
+      localStorage.setItem('userFirstName', response.data.firstName);
+      localStorage.setItem('userLastName', response.data.lastName);
+      localStorage.setItem('userRole', response.data.role);
+
+      handleLogin(response.data);
+
+      setOpenSnackbar(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Error during login:', error.response);
-      setSnackbarMessage('Failed to log in. Please check your credentials.');
+      console.error('Erreur lors de la connexion :', error.response);
+      setSnackbarMessage(
+        'Échec de la connexion. Veuillez vérifier vos identifiants.'
+      );
       setOpenSnackbar(true);
     }
   };
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedOut) {
+      handleLogin(null);
+      setIsLoggedOut(false);
+    }
+  }, [isLoggedOut, handleLogin]);
 
   const handleCloseSnackbar = (
     _event: React.SyntheticEvent | Event,
@@ -92,7 +127,7 @@ export default function Login() {
                   required
                   fullWidth
                   id="email"
-                  label="Email Address"
+                  label="Adresse e-mail"
                   autoFocus
                   onChange={handleChange}
                 />
@@ -102,7 +137,7 @@ export default function Login() {
                   required
                   fullWidth
                   name="password"
-                  label="Password"
+                  label="Mot de passe"
                   type="password"
                   id="password"
                   autoComplete="current-password"
@@ -121,29 +156,45 @@ export default function Login() {
                 backgroundColor: '#CBB780FF',
               }}
             >
-              Log In
+              Sign in
             </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    mt: 3,
-                    mb: 2,
-                    borderRadius: 2,
-                    backgroundColor: '#CBB780FF',
-                  }}
-                >
-                  <NavLink
-                    to="/register"
-                    style={{ color: '#ffffff', textDecoration: 'none' }}
+            {user ? (
+              <Button
+                onClick={handleUserLogout}
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  borderRadius: 2,
+                  backgroundColor: '#CBB780FF',
+                }}
+              >
+                Sign out
+              </Button>
+            ) : (
+              <Grid container justifyContent="flex-end">
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      mt: 3,
+                      mb: 2,
+                      borderRadius: 2,
+                      backgroundColor: '#CBB780FF',
+                    }}
                   >
-                    Create a New Account
-                  </NavLink>
-                </Button>
+                    <NavLink
+                      to="/register"
+                      style={{ color: '#ffffff', textDecoration: 'none' }}
+                    >
+                      Register
+                    </NavLink>
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
+            )}
           </Box>
         </Paper>
         <Snackbar

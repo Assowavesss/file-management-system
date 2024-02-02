@@ -1,7 +1,22 @@
-// registerUser.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
+
+// Function to determine the user's role based on email
+function determineUserRole(email) {
+  if (email.includes('@tutorefrei')) {
+    return 'Tutor Academic';
+  } else if (email.includes('@tutorentreprise')) {
+    return 'Tutor Enterprise';
+  } else if (email.includes('@efrei.net')) {
+    return 'Student';
+  } else if (email.includes('@admin.net')) {
+    return 'Admin'; // Ajout du rôle "Admin" pour les adresses se terminant par "@admin.net"
+  } else {
+    // Default role for other cases (e.g., generic user)
+    return 'User';
+  }
+}
 
 const registerUser = async (req, res) => {
   const { username, firstName, lastName, email, password, phone } = req.body;
@@ -23,6 +38,9 @@ const registerUser = async (req, res) => {
         .json({ message: 'User with the same email or username already exists!' });
     }
 
+    // Determine the role based on the email address
+    const role = determineUserRole(email);
+
     // Hacher le mot de passe avant de l'enregistrer dans la base de données
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -34,6 +52,7 @@ const registerUser = async (req, res) => {
         lastName,
         email,
         password: hashedPassword,
+        role, // Set the determined role here
         phone, // Ce champ est optionnel grâce à l'opérateur `?` dans le schéma
       },
     });

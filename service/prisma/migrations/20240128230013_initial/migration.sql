@@ -5,6 +5,7 @@ CREATE TABLE `User` (
     `lastName` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
+    `role` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `User_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -66,11 +67,8 @@ CREATE TABLE `EnterpriseTutor` (
 CREATE TABLE `Company` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `address` VARCHAR(191) NOT NULL,
-    `city` VARCHAR(191) NULL,
-    `email` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `Company_email_key`(`email`),
+    UNIQUE INDEX `Company_name_key`(`name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -87,12 +85,12 @@ CREATE TABLE `Internship` (
 
 -- CreateTable
 CREATE TABLE `Document` (
-    `id` VARCHAR(191) NOT NULL DEFAULT uuid(),
-    `fileName` VARCHAR(255) NOT NULL,
-    `filePath` VARCHAR(255) NOT NULL,
-    `fileType` VARCHAR(255) NOT NULL,
+    `id` VARCHAR(191) NOT NULL,
+    `fileName` VARCHAR(255) NOT NULL DEFAULT '',
+    `filePath` VARCHAR(255) NOT NULL DEFAULT '',
+    `fileType` VARCHAR(255) NOT NULL DEFAULT '',
     `fileSize` INTEGER NULL,
-    `documentType` VARCHAR(50) NOT NULL,
+    `documentType` VARCHAR(50) NOT NULL DEFAULT '',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

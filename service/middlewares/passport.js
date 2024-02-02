@@ -1,10 +1,11 @@
+// passport.js
 const passport = require('passport');
 const passportJwt = require('passport-jwt');
-require('dotenv').config();
 const { ExtractJwt } = passportJwt;
 const StrategyJwt = passportJwt.Strategy;
-const User = require('../models/user.model');
+const User = require('../prisma/schema.prisma'); // Assurez-vous que le chemin vers le modèle utilisateur est correct
 
+// Configuration de la stratégie Passport JWT
 passport.use(
   new StrategyJwt(
     {
@@ -17,3 +18,5 @@ passport.use(
         .catch((err) => done(err))
   )
 );
+
+module.exports = passport;

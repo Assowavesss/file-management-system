@@ -17,6 +17,7 @@ model User {
   admin     Admin? // Suppression de @unique, car un utilisateur peut être lié à un admin, un étudiant ou un tuteur
   student   Student?
   tutor     Tutor?
+  role      String //
 }
 
 model Admin {
@@ -45,6 +46,7 @@ model Tutor {
   tutorId          String            @unique
   user             User              @relation(fields: [userId], references: [id])
   userId           Int               @unique
+  email            String            @unique
   academicTutors   AcademicTutor[]
   enterpriseTutors EnterpriseTutor[]
 }
@@ -64,35 +66,37 @@ model EnterpriseTutor {
 }
 
 model Company {
-  id          Int          @id @default(autoincrement())
-  name        String
-  address     String
-  city        String?
-  email       String       @unique
-  internships Internship[]
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  Internship Internship[]
 }
 
 model Internship {
   id          Int          @id @default(autoincrement())
   title       String
-  date        DateTime
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  salary      Int
   companyId   Int
   evaluations Evaluation[]
+  tutorId     Int
   studentId   Int? // Le lien avec l'étudiant est facultatif
   Student     Student?     @relation(fields: [studentId], references: [id])
   Company     Company      @relation(fields: [companyId], references: [id])
 }
 
 model Document {
-  id           String   @id @default(dbgenerated("UUID()")) @map("id")
+  id           String   @id @default(uuid()) @map("id")
   fileName     String   @default("") @db.VarChar(255)
   filePath     String   @default("") @db.VarChar(255)
   fileType     String   @default("") @db.VarChar(255)
   fileSize     Int?
   documentType String   @default("") @db.VarChar(50)
+  // ... other fields
   CdC          CdC[]
   Report       Report[]
-  // ... autres champs communs
 }
 
 model CdC {

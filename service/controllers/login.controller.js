@@ -1,4 +1,4 @@
-// loginUser.js
+
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
@@ -30,12 +30,21 @@ const loginUser = async (req, res) => {
     }
 
     const jwtToken = jwt.sign(
-      { id: userWithEmail.id, email: userWithEmail.email },
+      {
+        id: userWithEmail.id,
+        email: userWithEmail.email,
+        firstName: userWithEmail.firstName,
+        lastName: userWithEmail.lastName,
+        role: userWithEmail.role
+      },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' } // Optionnel, spécifie quand le token expire
+      { expiresIn: '24h' }
     );
 
-    res.json({ message: 'Welcome Back!', token: jwtToken });
+    // Récupérez les informations de l'utilisateur ici
+    const { firstName, lastName, role } = userWithEmail;
+
+    res.json({ message: 'Welcome Back!', token: jwtToken, firstName, lastName, role });
   } catch (err) {
     console.error('Error: ', err);
     res.status(500).json({ message: 'Something went wrong' });

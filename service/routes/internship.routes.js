@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const internshipController = require('../controllers/internship.controller');
-// const authenticateJWT = require('../middlewares/authenticateJWT'); // Middleware d'authentification JWT
+
+const authenticateJWT = require('../middlewares/authenticateJWT'); // Middleware d'authentification JWT
 
 // Route pour créer un nouveau stage (protégée par JWT)
 router.post(
   '/internship',
-  // authenticateJWT,
+  authenticateJWT,
   internshipController.createInternship
 );
 

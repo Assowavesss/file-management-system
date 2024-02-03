@@ -1,10 +1,10 @@
-const jwt = require('jsonwebtoken');
-const jwtConfig = require('../config/jwt.config'); // Import your JWT configuration
+import jwt from 'jsonwebtoken';
+import jwtConfig from '../config/jwt.config.js';
 
 const authenticateJWT = (req, res, next) => {
   // L'en-tête d'autorisation normalement contient 'Bearer <token>'
   const authHeader = req.headers.authorization;
-  
+
   // Log the received authHeader for debugging purposes
   console.log('Received authHeader:', authHeader);
 
@@ -16,7 +16,7 @@ const authenticateJWT = (req, res, next) => {
   const parts = authHeader.split(' ');
   if (parts.length === 2 && parts[0] === 'Bearer') {
     const token = parts[1];
-    
+
     // Log the extracted token for debugging purposes
     console.log('Extracted JWT token:', token);
 
@@ -31,8 +31,10 @@ const authenticateJWT = (req, res, next) => {
     });
   } else {
     // The authHeader is not in 'Bearer <token>' format
-    return res.status(401).json({ error: 'Token is not in the correct format.' });
+    return res
+      .status(401)
+      .json({ error: 'Token is not in the correct format.' });
   }
 };
 
-module.exports = authenticateJWT;
+export default authenticateJWT;

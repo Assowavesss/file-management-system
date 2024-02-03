@@ -1,22 +1,22 @@
-const express = require('express');
-const app = express();
-const morgan = require('morgan');
-const helmet = require('helmet');
-const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
-
-require('dotenv').config();
-
+import express from 'express';
+import morgan from 'morgan';
+import helmet from 'helmet';
+import cors from 'cors';
+import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
+import api from './routes/index.js';
+import internshipRoutes from './routes/internship.js';
+import documentRoutes from './routes/document.js';
+import loginRoutes from './routes/login.js';
+import profilRoutes from './routes/profil.js' ;
+import { getAllInternships } from './controllers/internship.js';
+dotenv.config();
 // Créez une nouvelle instance de Prisma Client
 const prisma = new PrismaClient();
 
-const middlewares = require('./middlewares/errorMiddleware.js');
-const api = require('./routes/index.routes');
-const internshipRoutes = require('./routes/internship.routes');
-const documentRoutes = require('./routes/document.routes');
-const loginRoutes =require('./routes/login.routes.js')
-
-
+const app = express();
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -46,17 +46,22 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1', api);
 app.use('/api/v1/internship', internshipRoutes);
-app.use('/api/v1/document', documentRoutes);
+app.use('/api/v1/file', documentRoutes);
 app.use('/api/v1/download/:fileName', documentRoutes);
-app.use('/api/v1/login', loginRoutes)
+app.use('/api/v1/login', loginRoutes);
+app.use('/api/v1/profile', profilRoutes);
+app.get('/internships', getAllInternships);
 
-app.use(middlewares.notFound);
-app.use(middlewares.errorHandler);
+
+app.use(notFound);
+app.use(errorHandler);
+app.use(cookieParser());
 
 const port = process.env.PORT || 8080;
 
 // Connectez-vous à la base de données via Prisma Client
-prisma.$connect()
+prisma
+  .$connect()
   .then(() => {
     app.listen(port, () => {
       console.log(`Listening on: http://localhost:${port}`);
@@ -66,4 +71,4 @@ prisma.$connect()
     console.error('Error connecting to the database:', error);
   });
 
-module.exports = app;
+export default app;

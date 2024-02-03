@@ -58,17 +58,11 @@ export default function LoginPage() {
         loginData
       );
 
-      localStorage.setItem('userToken', response.data.token);
-      localStorage.setItem('userFirstName', response.data.firstName);
-      localStorage.setItem('userLastName', response.data.lastName);
-      localStorage.setItem('userRole', response.data.role);
-
-      handleLogin(response.data);
+      handleLogin(response.data.token);
 
       setOpenSnackbar(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error('Erreur lors de la connexion :', error.response);
+    } catch (error) {
+      console.error('Erreur lors de la connexion :', error);
       setSnackbarMessage(
         'Échec de la connexion. Veuillez vérifier vos identifiants.'
       );
@@ -79,10 +73,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isLoggedOut) {
-      handleLogin(null);
+      handleUserLogout();
       setIsLoggedOut(false);
     }
-  }, [isLoggedOut, handleLogin]);
+  }, [isLoggedOut, handleLogin, handleUserLogout]);
 
   const handleCloseSnackbar = (
     _event: React.SyntheticEvent | Event,

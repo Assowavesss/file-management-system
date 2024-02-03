@@ -1,7 +1,6 @@
-const { createInternship } = require('../controllers/internship.controller');
-const { Internship, Company, User } = require('../models');
+import { createInternship } from '../controllers/internship.js';
+import { Internship, Company, User } from '../models';
 
-// Mockez les dépendances (facultatif)
 jest.mock('../models', () => ({
   Internship: {
     create: jest.fn(),

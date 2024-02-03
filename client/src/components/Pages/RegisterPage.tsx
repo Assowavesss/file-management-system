@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import {
   Button,
@@ -10,16 +10,34 @@ import {
   Paper,
   Snackbar,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from '@mui/material';
+import { UserContext } from '../../../UserContext';
 
 export default function RegisterForm() {
+  const { handleLogin } = React.useContext(UserContext);
   const [emailError, setEmailError] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [role, setRole] = useState(''); // Par défaut, vous pouvez choisir le rôle par défaut ici
+  const [showPromotion, setShowPromotion] = useState(false);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget as HTMLFormElement);
     const email = data.get('email') as string;
+    console.log(
+      'Form data:',
+      data.get('firstName'),
+      data.get('lastName'),
+      email,
+      data.get('password'),
+      role,
+      data.get('promotion')
+    );
 
     // Vérification simple de l'email
     if (!email || !email.includes('@') || !email.includes('.')) {
@@ -32,12 +50,15 @@ export default function RegisterForm() {
       lastName: data.get('lastName') as string,
       email: email,
       password: data.get('password') as string,
+      role: role,
+      promotion: showPromotion ? data.get('promotion') : '', // Récupérez la promotion si le champ est visible
     };
-    console.log(user);
+
     axios
       .post('http://localhost:8080/api/v1/register', user)
       .then((response) => {
         console.log('Registration successful:', response.data);
+        handleLogin(response.data.token);
         setOpenSnackbar(true);
         setEmailError(false);
       })
@@ -45,7 +66,12 @@ export default function RegisterForm() {
         console.error('Error during registration:', error);
         setEmailError(false);
       });
-    console.log(user);
+  };
+
+  // Gérer le changement de rôle
+  const handleRoleChange = (event: SelectChangeEvent) => {
+    setRole(event.target.value as string);
+    setShowPromotion(event.target.value === 'Student');
   };
 
   const handleCloseSnackbar = (
@@ -123,6 +149,32 @@ export default function RegisterForm() {
                 autoComplete="new-password"
               />
             </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel id="role-label">Role</InputLabel>
+                <Select
+                  labelId="role-label"
+                  id="role"
+                  value={role}
+                  onChange={handleRoleChange}
+                >
+                  <MenuItem value="Tutor Academic">Tutor Academic</MenuItem>
+                  <MenuItem value="Tutor Enterprise">Tutor Enterprise</MenuItem>
+                  <MenuItem value="Student">Student</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {showPromotion && (
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="promotion"
+                  label="Promotion"
+                  id="promotion"
+                />
+              </Grid>
+            )}
           </Grid>
           <Button
             type="submit"

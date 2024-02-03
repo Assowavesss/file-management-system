@@ -1,0 +1,11 @@
+# Use the official Node.js 16 image from Docker Hub
+FROM node:18
+
+# Set the working directory
+WORKDIR /app
+
+COPY package.json ./
+RUN npm install
+
+# Run the app
+CMD npm run dev

@@ -1,11 +1,10 @@
-// passport.js
-const passport = require('passport');
-const passportJwt = require('passport-jwt');
-const { ExtractJwt } = passportJwt;
-const StrategyJwt = passportJwt.Strategy;
-const User = require('../prisma/schema.prisma'); // Assurez-vous que le chemin vers le modèle utilisateur est correct
+import passport from 'passport';
+import passportJwt, { ExtractJwt } from 'passport-jwt';
+import { PrismaClient } from '@prisma/client';
 
-// Configuration de la stratégie Passport JWT
+const StrategyJwt = passportJwt.Strategy;
+const prisma = new PrismaClient();
+
 passport.use(
   new StrategyJwt(
     {
@@ -13,10 +12,11 @@ passport.use(
       secretOrKey: process.env.JWT_SECRET,
     },
     (jwtPayload, done) =>
-      User.findOne({ where: { id: jwtPayload.id } })
+      prisma.user
+        .findUnique({ where: { id: jwtPayload.id } })
         .then((user) => done(null, user))
         .catch((err) => done(err))
   )
 );
 
-module.exports = passport;
+export default passport;

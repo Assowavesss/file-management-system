@@ -69,24 +69,19 @@ export default function FileUpload() {
       let errorMessage = 'Failed to upload file.';
 
       if (axios.isAxiosError(error)) {
-        // Now TypeScript knows that 'error' is an AxiosError
         const axiosError = error;
 
-        // Check if axiosError.response and axiosError.response.data exist
         if (axiosError.response && axiosError.response.data) {
           if (typeof axiosError.response.data === 'string') {
-            // Response data is a string
             errorMessage = axiosError.response.data;
           } else if (
             typeof axiosError.response.data === 'object' &&
             axiosError.response.data.message
           ) {
-            // Response data is an object with a 'message' property
             errorMessage = axiosError.response.data.message;
           }
         }
       } else {
-        // Handle non-Axios errors here
         if (error instanceof Error) {
           errorMessage = error.message;
         }
@@ -110,7 +105,7 @@ export default function FileUpload() {
 
   const loadFiles = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/v1/files');
+      const response = await axios.get('http://localhost:8080/api/v1/allfiles'); // Utilisation de la bonne URL
       setUploadedFiles(response.data);
     } catch (error) {
       console.error('Error loading files:', error);
@@ -120,15 +115,14 @@ export default function FileUpload() {
   const handleDownload = async (fileName: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/v1/files/download/${fileName}`,
+        `http://localhost:8080/api/v1/download/${fileName}`,
         {
           responseType: 'blob',
         }
       );
-      saveAs(response.data, fileName);
+      saveAs(response.data, fileName); // Utilisation de la bonne URL
     } catch (error) {
       console.error('Error during file download:', error);
-      // You may want to display an error message to the user here.
     }
   };
 

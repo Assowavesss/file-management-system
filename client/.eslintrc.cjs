@@ -20,6 +20,7 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    '@typescript-eslint/no-var-requires': 0,
     'prettier/prettier': 'error',
   },
 };

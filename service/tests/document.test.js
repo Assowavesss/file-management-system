@@ -1,12 +1,11 @@
-// __tests__/documentRoutes.test.js
-const request = require('supertest');
-const app = require('../server'); // Assurez-vous que cela pointe vers votre fichier app.js
+import request from 'supertest';
+import app from '../server';
 
 describe('POST /upload', () => {
   it('should upload a file', async () => {
     const res = await request(app)
-      .post('/upload') // Assurez-vous que le chemin est correct
-      .attach('file', '__tests__/testfiles/yourtestfile.jpg') // Remplacez par le chemin de votre fichier de test
+      .post('/upload')
+      .attach('file', '__tests__/testfiles/yourtestfile.jpg')
       .expect(200);
 
     expect(res.text).toEqual('Fichier téléchargé avec succès');
@@ -15,7 +14,7 @@ describe('POST /upload', () => {
   it('should fail on upload a non-allowed file type', async () => {
     await request(app)
       .post('/upload')
-      .attach('file', '__tests__/testfiles/yourtestfile.txt') // Un type de fichier non autorisé
+      .attach('file', '__tests__/testfiles/yourtestfile.txt')
       .expect(400);
   });
 });

@@ -41,7 +41,15 @@ export default function CreateInternshipForm() {
 
     // Utilisation de la fonction getToken pour obtenir le token
     function getToken() {
-      return localStorage.getItem('userToken'); // Remplacez 'token' par la clé réelle utilisée pour stocker le token
+      const cookies = document.cookie.split('; ');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'userToken') {
+          // Assurez-vous que 'userToken' correspond au nom du cookie
+          return value;
+        }
+      }
+      return null;
     }
 
     // Utilisation de la fonction getToken pour obtenir le token

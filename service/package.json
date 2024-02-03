@@ -6,6 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
+    "prisma": "npx prisma generate && npx prisma db push",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

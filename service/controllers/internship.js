@@ -78,7 +78,6 @@ const createInternship = async (req, res) => {
         salary: parseInt(req.body.internshipSalary, 10),
         companyId: company.id, // Utilisez le bon champ pour l'ID de l'entreprise
         tutorId: tutor.id,
-        studentId: studentId,
       },
     });
 

@@ -3,18 +3,23 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
+
 const createInternship = async (req, res) => {
   try {
+    console.log('Extracted JWT token:', req.headers.authorization.split(' ')[1]);
     console.log('Request Body:', req.body);
+    
     const token = req.headers.authorization.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const studentId = decoded.id;
+
     // Trouver ou créer l'entreprise associée au stage
     let company = await prisma.company.findUnique({
       where: { name: req.body.companyName },
     });
 
     if (!company) {
+      // Créer une nouvelle entreprise
       company = await prisma.company.create({
         data: {
           name: req.body.companyName,
@@ -28,11 +33,15 @@ const createInternship = async (req, res) => {
     });
 
     // Trouver ou créer le tuteur associé à l'utilisateur
-    let tutor = null;
-    if (user) {
-      tutor = await prisma.tutor.findUnique({
-        where: { userId: user.id },
+    let tutor;
+    try {
+      tutor = await prisma.tutor.upsert({
+        where: { userId },
+        update: tutorData,
+        create: { userId, ...tutorData },
       });
+    } catch (error) {
+      return res.status(500).json({ error: 'Failed to create or update tutor' });
     }
     if (!tutor && user) {
       // Créer le tuteur associé à l'utilisateur
@@ -40,19 +49,20 @@ const createInternship = async (req, res) => {
         data: {
           userId: user.id,
           // Ajoutez d'autres champs si nécessaire
-        },});
-      }
+        },
+      });
+    }
 
     if (!tutor) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash('12345678', salt);
       // Créer un nouvel utilisateur avec un mot de passe par défaut
-      const user = await prisma.user.create({
+      user = await prisma.user.create({
         data: {
-          firstName: req.body.companyTutorFirstName, // Utilisez le bon champ pour le prénom du tuteur
-          lastName: req.body.companyTutorLastName, // Utilisez le bon champ pour le nom du tuteur
+          firstName: req.body.companyTutorFirstName,
+          lastName: req.body.companyTutorLastName,
           email: req.body.companyTutorEmail,
-          password: hashedPassword, // Remplacez ceci par le mot de passe par défaut que vous voulez
+          password: hashedPassword,
           role: 'Enterprise Tutor',
         },
       });
@@ -60,10 +70,8 @@ const createInternship = async (req, res) => {
       // Créer le tuteur associé à l'utilisateur
       tutor = await prisma.tutor.create({
         data: {
-          name: req.body.companyTutorName,
-          email: req.body.companyTutorEmail,
           userId: user.id,
-          tutorId: user.id.toString(),
+          // Ajoutez d'autres champs si nécessaire
         },
       });
     }
@@ -76,8 +84,9 @@ const createInternship = async (req, res) => {
         startDate: new Date(req.body.internshipStartDate),
         endDate: new Date(req.body.internshipEndDate),
         salary: parseInt(req.body.internshipSalary, 10),
-        companyId: company.id, // Utilisez le bon champ pour l'ID de l'entreprise
+        companyId: company.id,
         tutorId: tutor.id,
+        studentId: studentId,
       },
     });
 
@@ -86,7 +95,6 @@ const createInternship = async (req, res) => {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error.' });
   }
-  
 };
 const getAllInternships = async (req, res) => {
   try {
@@ -101,4 +109,4 @@ const getAllInternships = async (req, res) => {
   }
 };
 
-export { createInternship, getAllInternships};
+export { createInternship,getAllInternships };

@@ -9,15 +9,16 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  password  String
-  email     String   @unique
-  admin     Admin? // Suppression de @unique, car un utilisateur peut être lié à un admin, un étudiant ou un tuteur
-  student   Student?
-  tutor     Tutor?
-  role      String //
+  id         Int          @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  password   String
+  email      String       @unique
+  admin      Admin? // Suppression de @unique, car un utilisateur peut être lié à un admin, un étudiant ou un tuteur
+  student    Student?
+  tutor      Tutor?
+  role       String //
+  Internship Internship[]
 }
 
 model Admin {
@@ -27,21 +28,18 @@ model Admin {
   userId  Int    @unique
 }
 
-// student has relation one to one to internship
 model Student {
-  id        Int    @id @default(autoincrement())
-  promotion String
-  user      User   @relation(fields: [userId], references: [id])
-  userId    Int    @unique
-
-  internship   Internship? @relation(fields: [internshipId], references: [id])
-  internshipId Int?        @unique
-
+  id                Int              @id @default(autoincrement())
+  promotion         String
+  user              User             @relation(fields: [userId], references: [id])
+  userId            Int              @unique
+  internships       Internship[] // Relation one-to-many avec Internship
   evaluations       Evaluation[]
   academicTutor     AcademicTutor?   @relation(fields: [academicTutorId], references: [id])
   academicTutorId   Int?
   enterpriseTutor   EnterpriseTutor? @relation(fields: [enterpriseTutorId], references: [id])
   enterpriseTutorId Int?
+  companies         Company[] // Ajout de cette relation pour lier les étudiants aux entreprises
 }
 
 model Tutor {
@@ -70,7 +68,8 @@ model Company {
   id   Int    @id @default(autoincrement())
   name String @unique
 
-  internships Internship[]
+  students   Student[]
+  Internship Internship[]
 }
 
 model Internship {
@@ -85,8 +84,10 @@ model Internship {
   tutorId     Int
   company     Company      @relation(fields: [companyId], references: [id])
   documents   Document[]
-
-  student Student?
+  student     Student?     @relation(fields: [studentId], references: [id])
+  studentId   Int?
+  user        User         @relation(fields: [userId], references: [id]) // Relation avec l'utilisateur qui a créé l'internship
+  userId      Int
 }
 
 model Document {

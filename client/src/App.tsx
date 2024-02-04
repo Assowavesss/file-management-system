@@ -51,10 +51,13 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/upload-files" element={<UploadPage />} />
                 <Route
                   path="/all-internships"
                   element={<IntershipsAllPage />}
+                />
+                <Route
+                  path="/all-internships/:internshipId"
+                  element={<UploadPage />}
                 />
               </Routes>
             </Box>

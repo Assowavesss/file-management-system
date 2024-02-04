@@ -128,10 +128,12 @@ export default function CreateInternshipForm() {
               <TextField
                 required
                 fullWidth
+                InputLabelProps={{ shrink: true }}
                 id="internshipStartDate"
                 label="Start Date"
                 name="internshipStartDate"
                 type="date"
+                filled={false}
                 value={internshipStartDate}
                 onChange={(e) => setInternshipStartDate(e.target.value)}
               />
@@ -140,6 +142,7 @@ export default function CreateInternshipForm() {
               <TextField
                 required
                 fullWidth
+                InputLabelProps={{ shrink: true }}
                 id="internshipEndDate"
                 label="End Date"
                 name="internshipEndDate"

@@ -58,14 +58,7 @@ const Navbar = () => {
             alignItems="center"
             sx={{ flex: 1, display: { xs: 'none', sm: 'flex' } }}
           >
-            {[
-              'Upload Files',
-              'Meeting',
-              'Evaluation Form',
-              'Report Validation',
-              'Internship',
-              'All Internships',
-            ].map((item, index) => (
+            {['Internship', 'All Internships'].map((item, index) => (
               <Button component={Link} to={`/${itemToLink(item)}`} key={index}>
                 {item}
               </Button>

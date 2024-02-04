@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useParams } from 'react-router-dom';
 import { saveAs } from 'file-saver';
 import axios from 'axios';
 import {
@@ -28,6 +29,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 const theme = createTheme();
 
 export default function FileUpload() {
+  const { productId } = useParams();
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<string>('');
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -37,7 +39,8 @@ export default function FileUpload() {
 
   useEffect(() => {
     loadFiles();
-  }, []);
+    console.log(productId);
+  }, [productId]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files ? e.target.files[0] : null;

@@ -44,11 +44,16 @@ export default function AllInternships() {
       .then((response) => {
         setInternships(response.data);
         // Récupérer les informations sur les utilisateurs
-        const tutorIds = response.data.map((internship: Internship) => internship.tutorId);
+        const tutorIds = response.data.map(
+          (internship: Internship) => internship.tutorId
+        );
         fetchUsers(tutorIds);
       })
       .catch((error) => {
-        console.error('Erreur lors de la récupération des internships :', error);
+        console.error(
+          'Erreur lors de la récupération des internships :',
+          error
+        );
       });
   }, []); // Dépendances vides pour exécuter l'effet une seule fois
 
@@ -60,7 +65,10 @@ export default function AllInternships() {
         setUsers(response.data);
       })
       .catch((error) => {
-        console.error('Erreur lors de la récupération des utilisateurs :', error);
+        console.error(
+          'Erreur lors de la récupération des utilisateurs :',
+          error
+        );
       });
   };
 
@@ -81,7 +89,14 @@ export default function AllInternships() {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <Typography
         variant="h4"
         gutterBottom
@@ -99,9 +114,10 @@ export default function AllInternships() {
           padding: '10px 20px',
           borderRadius: '10px',
           display: 'inline-block',
+          alignItems: 'center',
         }}
       >
-        Toutes les Internships
+        Internships
       </Typography>
 
       <TableContainer

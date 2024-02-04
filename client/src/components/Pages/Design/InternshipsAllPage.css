@@ -1,0 +1,44 @@
+/* Styles pour centrer le tableau */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Styles pour le conteneur du tableau */
+.table-container {
+  border: 1px solid #000; /* Bordure noire autour du tableau */
+  margin-top: 20px;
+  padding: 20px;
+  max-width: 800px; /* Définissez la largeur maximale souhaitée */
+  width: 100%; /* Occupe toute la largeur disponible */
+  overflow-x: auto; /* Ajoute une barre de défilement horizontale si nécessaire */
+  margin-left: auto; /* Centre le conteneur horizontalement */
+  margin-right: auto; /* Centre le conteneur horizontalement */
+}
+
+/* Styles pour le titre du tableau */
+
+
+/* Styles pour la table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000; /* Bordure noire autour de la table */
+}
+
+/* Styles pour les en-têtes de colonne */
+th {
+  background-color: #f2f2f2;
+  border: 2px solid #000; /* Bordure noire autour des cellules de l'en-tête */
+  padding: 10px;
+}
+
+/* Styles pour les cellules de données */
+td {
+  border: 2px solid #000; /* Bordure noire autour des cellules de données */
+  padding: 10px;
+}
+
+/* Autres styles CSS selon vos besoins */

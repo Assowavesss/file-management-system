@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { generateToken } from './login.js';
+import jwt from 'jsonwebtoken';
+
 const prisma = new PrismaClient();
 
 // Function to determine the user's role based on email
@@ -8,8 +10,6 @@ function roleEqualToEmail(email, role) {
   switch (role) {
     case 'Student':
       return email.endsWith('@efrei.net');
-    case 'Tutor Academic':
-      return email.endsWith('@tutorefrei.net');
     case 'Tutor Enterprise':
       return email.endsWith('@tutorentreprise.net');
     case 'Admin':
@@ -20,15 +20,31 @@ function roleEqualToEmail(email, role) {
 }
 
 const registerUser = async (req, res) => {
-  const { username, firstName, lastName, email, password, role } = req.body;
+  const { username, firstName, lastName, email, password, role, promotion } = req.body;
 
   if (!roleEqualToEmail(email, role)) {
     return res.status(400).json({ message: 'Role and email are not' });
   }
 
+  console.log('Extracted JWT token:', req.headers.authorization.split(' ')[1]);
+  console.log('Request Body:', req.body);
+    
+  const token = req.headers.authorization.split(' ')[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const adminId = decoded.id;
+
   try {
     await prisma.$transaction(async (prisma) => {
-      // Vérifiez si l'utilisateur existe déjà avec l'email ou le nom d'utilisateur
+      const checkAdmin = await prisma.admin.findUnique({
+        where: {
+          id: adminId,
+        },
+      });
+      
+      if(!checkAdmin) {
+        return res.status(404).json({message: "You're not the admin"});
+      }
+      
       const alreadyExistsUser = await prisma.user.findFirst({
         where: {
           OR: [{ email }, { username }],
@@ -56,20 +72,9 @@ const registerUser = async (req, res) => {
         },
       });
       console.log(newUser);
-      if (role === 'Tutor Academic') {
-        await prisma.academicTutor.create({
-          data: {
-            tutor: {
-              create: {
-                userId: newUser.id,
-              },
-            },
-          },
-        });
-      }
-
+      
       if (role === 'Tutor Enterprise') {
-        await prisma.enterpriseTutor.create({
+        await prisma.tutor.create({
           data: {
             tutor: {
               create: {
@@ -79,19 +84,24 @@ const registerUser = async (req, res) => {
           },
         });
       }
-
-      if (role === 'Student') {
+      else if (role === 'Student') {
         await prisma.student.create({
           data: {
             userId: newUser.id,
-            promotion: req.body.promotion,
+            promotion: promotion,
+          },
+        });
+      }
+      else if (role === 'Admin') {
+        await prisma.admin.create({
+          data: {
+            userId: newUser.id,
           },
         });
       }
 
       if (newUser) {
-        const jwtToken = generateToken(newUser);
-        res.json({ message: 'Merci pour votre inscription', token: jwtToken });
+        res.json({ message: 'Merci pour votre inscription'});
       }
     });
   } catch (error) {

@@ -38,6 +38,7 @@ function App() {
               }}
             >
               <Routes>
+                <Route path="/" element={<LoginPage />} />
                 <Route path="/internship" element={<InternshipPage />} />
                 <Route path="/meeting" element={<MeetingPage />} />
                 <Route

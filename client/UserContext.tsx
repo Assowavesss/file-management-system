@@ -11,7 +11,10 @@ import {
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
-export type Role = 'Student' | 'Tutor' | 'Admin';
+export enum Role {
+  Student = 'Student',
+  Admin = 'Admin',
+}
 
 export interface UserData {
   token: string;

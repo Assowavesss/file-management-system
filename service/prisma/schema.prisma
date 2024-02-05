@@ -18,7 +18,6 @@ model User {
   student    Student?
   tutor      Tutor?
   role       String //
-  Internship Internship[]
 }
 
 model Admin {
@@ -48,6 +47,7 @@ model Tutor {
   userId           Int               @unique
   academicTutors   AcademicTutor[]
   enterpriseTutors EnterpriseTutor[]
+  Internship       Internship[]
 }
 
 model AcademicTutor {
@@ -82,12 +82,12 @@ model Internship {
   companyId   Int
   evaluations Evaluation[]
   tutorId     Int
+  tutor       Tutor        @relation(fields: [tutorId], references: [id])
   company     Company      @relation(fields: [companyId], references: [id])
   documents   Document[]
   student     Student?     @relation(fields: [studentId], references: [id])
   studentId   Int?
-  user        User         @relation(fields: [userId], references: [id]) // Relation avec l'utilisateur qui a créé l'internship
-  userId      Int
+
 }
 
 model Document {

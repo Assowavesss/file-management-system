@@ -43,6 +43,9 @@ const Navbar = () => {
           <Button component={Link} to="/internship">
             Internship
           </Button>
+          <Button component={Link} to="/all-internships">
+            All Internships
+          </Button>
           <Button variant="contained" onClick={handleUserLogout}>
             Sign out
           </Button>

@@ -11,8 +11,10 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
+import withRoles from '../withRoles/withRoles';
+import { Role } from '../../../UserContext';
 
-export default function CreateInternshipForm() {
+function CreateInternshipForm() {
   const [internshipTitle, setInternshipTitle] = useState('');
   const [internshipDescription, setInternshipDescription] = useState('');
   const [internshipStartDate, setInternshipStartDate] = useState('');
@@ -23,7 +25,6 @@ export default function CreateInternshipForm() {
   const [companyTutorEmail, setCompanyTutorEmail] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [internshipSalary, setInternshipSalary] = useState('');
-
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
 
@@ -133,7 +134,6 @@ export default function CreateInternshipForm() {
                 label="Start Date"
                 name="internshipStartDate"
                 type="date"
-                filled={false}
                 value={internshipStartDate}
                 onChange={(e) => setInternshipStartDate(e.target.value)}
               />
@@ -235,3 +235,11 @@ export default function CreateInternshipForm() {
     </Container>
   );
 }
+
+const allowedRoles = [Role.Student, Role.Admin];
+const CreateInternshipFormWithRoles = withRoles(
+  CreateInternshipForm,
+  allowedRoles
+);
+
+export default CreateInternshipFormWithRoles;

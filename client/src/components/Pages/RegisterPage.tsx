@@ -25,6 +25,19 @@ export default function RegisterForm() {
   const [role, setRole] = useState(''); // Par défaut, vous pouvez choisir le rôle par défaut ici
   const [showPromotion, setShowPromotion] = useState(false);
 
+  // Utilisation de la fonction getToken pour obtenir le token
+  function getToken() {
+    const cookies = document.cookie.split('; ');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split('=');
+      if (name === 'userToken') {
+        // Assurez-vous que 'userToken' correspond au nom du cookie
+        return value;
+      }
+    }
+    return null;
+  }
+
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget as HTMLFormElement);
@@ -54,8 +67,13 @@ export default function RegisterForm() {
       promotion: showPromotion ? data.get('promotion') : '', // Récupérez la promotion si le champ est visible
     };
 
+    const token = getToken();
     axios
-      .post('http://localhost:8080/api/v1/register', user)
+      .post('http://localhost:8080/api/v1/register', user, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         console.log('Registration successful:', response.data);
         handleLogin(response.data.token);

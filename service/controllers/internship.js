@@ -15,36 +15,40 @@ const createInternship = async (req, res) => {
 
     const body = req.body;
 
+    const isTutor = await prisma.tutor.findUnique({
+      where: {
+        userId: studentId,
+      },
+    });
+    
+    if(isTutor) {
+      return res.status(404).json({message: "You're not a student"});
+    }
+
     // Trouver ou créer l'entreprise associée au stage
     const company = await prisma.company.upsert({
       create: { name: body.companyName },
       where: { name: body.companyName },
       update: { name: body.companyName}
     });
+    
 
-    // Trouver l'utilisateur associé au tuteur
-    const user = await prisma.user.upsert({
-      where: { email: body.companyTutorEmail },
-      update: {firstName: body.companyTutorFirstName,
-        lastName: body.companyTutorLastName,},
-      create: { 
-        firstName: body.companyTutorFirstName,
-        lastName: body.companyTutorLastName,
+    console.log((await prisma.tutor.findMany()));
+
+    const userTutor = await prisma.user.findUnique({
+      where: {
         email: body.companyTutorEmail,
-        password: (await bcrypt.hash('12345678', (await bcrypt.genSalt(10)))),
-        role: 'Enterprise Tutor',
+        role: "Tutor"
       },
     });
 
-
-    // Trouver ou créer le tuteur associé à l'utilisateur
-    const tutor = await prisma.tutor.upsert({
-      where: { userId: user.id },
-      update: { userId: user.id},
-      create: { userId: user.id },
+    const tutor = await prisma.tutor.findUnique({
+      where: {
+        userId: userTutor.id
+      }
     });
-    console.log(studentId);
-    // Créer le stage avec l'entreprise et le tuteur associés
+
+    console.log(tutor.userId);
     const internship = await prisma.internship.create({
       data: {
         title: req.body.internshipTitle,
@@ -54,7 +58,7 @@ const createInternship = async (req, res) => {
         salary: parseInt(req.body.internshipSalary, 10),
         companyId: company.id,
         tutorId: tutor.id,
-        studentId: 1,
+        studentId: studentId,
       },
     });
 
@@ -64,6 +68,8 @@ const createInternship = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error.' });
   }
 };
+
+
 const getAllInternships = async (req, res) => {
   try {
     // Récupérer la liste de toutes les internships depuis la base de données

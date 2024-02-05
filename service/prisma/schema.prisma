@@ -9,15 +9,15 @@ generator client {
 }
 
 model User {
-  id         Int          @id @default(autoincrement())
-  firstName  String
-  lastName   String
-  password   String
-  email      String       @unique
-  admin      Admin? // Suppression de @unique, car un utilisateur peut être lié à un admin, un étudiant ou un tuteur
-  student    Student?
-  tutor      Tutor?
-  role       String //
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  password  String
+  email     String   @unique
+  role      String
+  admin     Admin?
+  student   Student?
+  tutor     Tutor?
 }
 
 model Admin {
@@ -28,47 +28,23 @@ model Admin {
 }
 
 model Student {
-  id                Int              @id @default(autoincrement())
-  promotion         String
-  user              User             @relation(fields: [userId], references: [id])
-  userId            Int              @unique
-  internships       Internship[] // Relation one-to-many avec Internship
-  evaluations       Evaluation[]
-  academicTutor     AcademicTutor?   @relation(fields: [academicTutorId], references: [id])
-  academicTutorId   Int?
-  enterpriseTutor   EnterpriseTutor? @relation(fields: [enterpriseTutorId], references: [id])
-  enterpriseTutorId Int?
-  companies         Company[] // Ajout de cette relation pour lier les étudiants aux entreprises
+  id         Int          @id @default(autoincrement())
+  promotion  String
+  user       User         @relation(fields: [userId], references: [id])
+  userId     Int          @unique
+  Internship Internship[]
 }
 
 model Tutor {
-  id               Int               @id @default(autoincrement())
-  user             User              @relation(fields: [userId], references: [id])
-  userId           Int               @unique
-  academicTutors   AcademicTutor[]
-  enterpriseTutors EnterpriseTutor[]
-  Internship       Internship[]
-}
-
-model AcademicTutor {
-  id       Int       @id @default(autoincrement())
-  tutor    Tutor     @relation(fields: [tutorId], references: [id])
-  tutorId  Int
-  students Student[]
-}
-
-model EnterpriseTutor {
-  id       Int       @id @default(autoincrement())
-  tutor    Tutor     @relation(fields: [tutorId], references: [id])
-  tutorId  Int
-  students Student[]
+  id         Int          @id @default(autoincrement())
+  user       User         @relation(fields: [userId], references: [id])
+  userId     Int          @unique
+  Internship Internship[]
 }
 
 model Company {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
-  students   Student[]
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
   Internship Internship[]
 }
 
@@ -87,7 +63,6 @@ model Internship {
   documents   Document[]
   student     Student?     @relation(fields: [studentId], references: [id])
   studentId   Int?
-
 }
 
 model Document {
@@ -109,59 +84,20 @@ model CdC {
   file       String
   documentId String // Le type doit correspondre à Document
   document   Document @relation(fields: [documentId], references: [id])
-  // ...
 }
 
 model Report {
   id         Int      @id @default(autoincrement())
   file       String
-  documentId String // Le type doit correspondre à Document
+  documentId String
   document   Document @relation(fields: [documentId], references: [id])
-  // ...
 }
 
 model Evaluation {
-  id               Int                 @id @default(autoincrement())
-  evaluation       String
-  submissionDate   DateTime
-  factor           Int
-  internshipId     Int
-  studentId        Int? // L'étudiant est facultatif
-  ReportEvaluation ReportEvaluation[]
-  studentEvals     StudentEvaluation[]
-  companyEvals     CompanyEvaluation[]
-  Student          Student?            @relation(fields: [studentId], references: [id])
-  Internship       Internship          @relation(fields: [internshipId], references: [id])
-}
-
-model StudentEvaluation {
-  id           Int        @id @default(autoincrement())
-  evaluationId Int
-  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
-}
-
-model CompanyEvaluation {
-  id           Int        @id @default(autoincrement())
-  evaluationId Int
-  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
-}
-
-model Soutenance {
-  id          Int                    @id @default(autoincrement())
-  date        DateTime
-  status      String
-  evaluations SoutenanceEvaluation[]
-}
-
-model SoutenanceEvaluation {
-  id           Int        @id @default(autoincrement())
-  soutenanceId Int
-  soutenance   Soutenance @relation(fields: [soutenanceId], references: [id])
-}
-
-model ReportEvaluation {
-  id           Int        @id @default(autoincrement())
-  reportEvalId Int
-  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
-  evaluationId Int
+  id             Int        @id @default(autoincrement())
+  evaluation     String
+  submissionDate DateTime
+  factor         Int
+  internshipId   Int
+  Internship     Internship @relation(fields: [internshipId], references: [id])
 }

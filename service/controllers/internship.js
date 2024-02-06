@@ -77,7 +77,7 @@ const createInternship = async (req, res) => {
 };
 
 
-const getAllInternships = async (req, res) => {
+const getAllInternships = async (_, res) => {
   try {
     const internships = await prisma.internship.findMany({
       include: {

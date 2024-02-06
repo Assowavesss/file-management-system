@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Table,
@@ -37,7 +37,7 @@ interface Internship {
   startDate: string;
   endDate: string;
   salary: number;
-  student: User;
+  student: { user: User };
   company: Company;
   tutor: Tutor;
   validated: boolean;
@@ -45,7 +45,7 @@ interface Internship {
 
 export default function AllInternships() {
   const [internships, setInternships] = useState<Internship[]>([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     axios
       .get('http://localhost:8080/internships')
@@ -131,6 +131,7 @@ export default function AllInternships() {
                     ? `${internship.student.user.firstName} ${internship.student.user.lastName}`
                     : 'Chargement...'}
                 </TableCell>
+
                 <TableCell>{internship.company.name}</TableCell>
                 <TableCell>{`${internship.tutor.user.firstName} ${internship.tutor.user.lastName}`}</TableCell>
                 <TableCell>
@@ -140,6 +141,17 @@ export default function AllInternships() {
                     onClick={() => handleValidationToggle(internship.id)}
                   >
                     {internship.validated ? 'Validated' : 'Not Validated'}
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() =>
+                      navigate(`/all-internships/${internship.id}`)
+                    }
+                  >
+                    View Files
                   </Button>
                 </TableCell>
               </TableRow>

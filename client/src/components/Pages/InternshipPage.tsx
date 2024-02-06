@@ -13,8 +13,10 @@ import {
 } from '@mui/material';
 import withRoles from '../withRoles/withRoles';
 import { Role } from '../../../UserContext';
+import { useNavigate } from 'react-router-dom';
 
 function CreateInternshipForm() {
+  const navigate = useNavigate();
   const [internshipTitle, setInternshipTitle] = useState('');
   const [internshipDescription, setInternshipDescription] = useState('');
   const [internshipStartDate, setInternshipStartDate] = useState('');
@@ -62,8 +64,9 @@ function CreateInternshipForm() {
         },
       })
       .then((response) => {
-        console.log('Internship created successfully:', response.data);
-        setOpenSnackbar(true);
+        // Suppose que response.data contient l'objet stage créé, y compris son ID
+        const internshipId = response.data.id;
+        navigate(`/all-internships/${internshipId}`);
       })
       .catch((error) => {
         console.error('Error during internship creation:', error);

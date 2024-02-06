@@ -5,7 +5,7 @@ import upload from '../middlewares/fileUpload.js';
 const router = express.Router();
 
 // Route pour télécharger un fichier
-router.post('/upload', upload.single('file'), documentController.uploadFile);
+router.post('/upload/:internshipId', upload.single('file'), documentController.uploadFile);
 
 // Route pour obtenir la liste de tous les fichiers
 router.get('/allfiles', documentController.getAllFiles);

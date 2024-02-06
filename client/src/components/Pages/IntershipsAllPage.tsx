@@ -14,6 +14,22 @@ import {
 } from '@mui/material';
 import './Design/InternshipsAllPage.css';
 
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+interface Company {
+  id: number;
+  name: string;
+}
+
+interface Tutor {
+  id: number;
+  user: User;
+}
+
 interface Internship {
   id: number;
   title: string;
@@ -21,71 +37,35 @@ interface Internship {
   startDate: string;
   endDate: string;
   salary: number;
-  studentId: number;
-  companyId: number;
-  tutorId: number; // Utiliser tutorId pour stocker l'ID du tuteur
+  student: User;
+  company: Company;
+  tutor: Tutor;
   validated: boolean;
-}
-
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
 }
 
 export default function AllInternships() {
   const [internships, setInternships] = useState<Internship[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    // Effectue une requête GET pour récupérer toutes les internships
     axios
       .get('http://localhost:8080/internships')
       .then((response) => {
         setInternships(response.data);
-        // Récupérer les informations sur les utilisateurs
-        const tutorIds = response.data.map(
-          (internship: Internship) => internship.tutorId
-        );
-        fetchUsers(tutorIds);
       })
       .catch((error) => {
-        console.error(
-          'Erreur lors de la récupération des internships :',
-          error
-        );
+        console.error('Erreur lors de la récupération des stages :', error);
       });
-  }, []); // Dépendances vides pour exécuter l'effet une seule fois
-
-  // Fonction pour récupérer les informations des utilisateurs en fonction des IDs
-  const fetchUsers = (tutorIds: number[]) => {
-    axios
-      .get(`http://localhost:8080/users?id=${tutorIds.join(',')}`)
-      .then((response) => {
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        console.error(
-          'Erreur lors de la récupération des utilisateurs :',
-          error
-        );
-      });
-  };
-
-  // Associer les informations sur l'utilisateur à l'internship en fonction de l'ID du tuteur
-  const getUserName = (tutorId: number) => {
-    const user = users.find((user) => user.id === tutorId);
-    return user ? `${user.firstName} ${user.lastName}` : 'Pas de tuteur';
-  };
+  }, []);
 
   const handleValidationToggle = (internshipId: number) => {
-    const updatedInternships = internships.map((internship) => {
-      if (internship.id === internshipId) {
-        return { ...internship, validated: !internship.validated };
-      }
-      return internship;
-    });
-    setInternships(updatedInternships);
+    setInternships(
+      internships.map((internship) => {
+        if (internship.id === internshipId) {
+          return { ...internship, validated: !internship.validated };
+        }
+        return internship;
+      })
+    );
   };
 
   return (
@@ -117,24 +97,24 @@ export default function AllInternships() {
           alignItems: 'center',
         }}
       >
-        Internships
+        All Internships
       </Typography>
 
       <TableContainer
         component={Paper}
-        style={{ maxWidth: '1800px', margin: '0 auto' }}
+        style={{ maxWidth: '95%', margin: '20px' }}
       >
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Titre</TableCell>
+              <TableCell>Title</TableCell>
               <TableCell>Description</TableCell>
-              <TableCell>Début</TableCell>
-              <TableCell>Fin</TableCell>
-              <TableCell>Salaire (EUR)</TableCell>
-              <TableCell>Student ID</TableCell>
-              <TableCell>Company ID</TableCell>
-              <TableCell>Tutor ID</TableCell>
+              <TableCell>Start Date</TableCell>
+              <TableCell>End Date</TableCell>
+              <TableCell>Salary</TableCell>
+              <TableCell>Student</TableCell>
+              <TableCell>Company</TableCell>
+              <TableCell>Tutor</TableCell>
               <TableCell>Validation</TableCell>
             </TableRow>
           </TableHead>
@@ -146,16 +126,20 @@ export default function AllInternships() {
                 <TableCell>{internship.startDate}</TableCell>
                 <TableCell>{internship.endDate}</TableCell>
                 <TableCell>{internship.salary}</TableCell>
-                <TableCell>{internship.studentId}</TableCell>
-                <TableCell>{internship.companyId}</TableCell>
-                <TableCell>{getUserName(internship.tutorId)}</TableCell>
+                <TableCell>
+                  {internship.student
+                    ? `${internship.student.firstName} ${internship.student.lastName}`
+                    : 'Chargement...'}
+                </TableCell>
+                <TableCell>{internship.company.name}</TableCell>
+                <TableCell>{`${internship.tutor.user.firstName} ${internship.tutor.user.lastName}`}</TableCell>
                 <TableCell>
                   <Button
                     variant="contained"
                     color={internship.validated ? 'success' : 'error'}
                     onClick={() => handleValidationToggle(internship.id)}
                   >
-                    {internship.validated ? 'Validé' : 'Non validé'}
+                    {internship.validated ? 'Validated' : 'Not Validated'}
                   </Button>
                 </TableCell>
               </TableRow>

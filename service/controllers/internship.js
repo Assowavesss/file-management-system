@@ -48,7 +48,14 @@ const createInternship = async (req, res) => {
       }
     });
 
-    console.log(tutor.userId);
+    const student = await prisma.student.findUnique({
+      where: {
+        userId: studentId
+      },
+    });
+
+
+    console.log(studentId);
     const internship = await prisma.internship.create({
       data: {
         title: req.body.internshipTitle,
@@ -58,7 +65,7 @@ const createInternship = async (req, res) => {
         salary: parseInt(req.body.internshipSalary, 10),
         companyId: company.id,
         tutorId: tutor.id,
-        studentId: studentId,
+        studentId: student.id,
       },
     });
 
@@ -72,15 +79,28 @@ const createInternship = async (req, res) => {
 
 const getAllInternships = async (req, res) => {
   try {
-    // Récupérer la liste de toutes les internships depuis la base de données
-    const internships = await prisma.internship.findMany();
-
-    // Envoyer la liste en réponse sous forme de JSON
+    const internships = await prisma.internship.findMany({
+      include: {
+        student: {
+          include: {
+            user: true
+          }
+        },
+        company: true,
+        tutor: {
+          include: {
+            user: true
+          }
+        }
+      }
+    });
     res.status(200).json(internships);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    res.status(500).json({ error: 'Erreur interne du serveur.' });
   }
+
 };
+
 
 export { createInternship,getAllInternships };

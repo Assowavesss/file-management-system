@@ -21,21 +21,30 @@ const loginUser = async (req, res) => {
 
   try {
     const userWithEmail = await prisma.user.findUnique({
-      where: { email , password},
+      where: { email },
     });
-    console.log('aaa');
+
     if (!userWithEmail) {
       return res
         .status(400)
         .json({ message: 'Email or password does not match!' });
     }
-    console.log('aaa');
-    
-    console.log('aaa');
+
+    const passwordMatch = await bcrypt.compare(
+      password,
+      userWithEmail.password
+    );
+
+    if (!passwordMatch) {
+      return res
+        .status(400)
+        .json({ message: 'Email or password does not match!' });
+    }
+
     const jwtToken = generateToken(userWithEmail);
     res.clearCookie('userToken');
     res.cookie('userToken', jwtToken, { httpOnly: true, secure: true, sameSite: 'none' });
-    console.log('aaa');
+
     res.json({ message: 'Welcome Back!', token: jwtToken });
   } catch (err) {
     console.error('Error: ', err);

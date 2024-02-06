@@ -19,7 +19,6 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Divider,
   IconButton,
   SelectChangeEvent,
 } from '@mui/material';
@@ -114,7 +113,7 @@ export default function FileUpload() {
     try {
       const response = await axios.get(
         `http://localhost:8080/api/v1/allfiles/${internshipId}`
-      ); // Utilisation de la bonne URL
+      );
       setUploadedFiles(response.data);
     } catch (error) {
       console.error('Error loading files:', error);
@@ -129,15 +128,38 @@ export default function FileUpload() {
           responseType: 'blob',
         }
       );
-      saveAs(response.data, fileName); // Utilisation de la bonne URL
+      saveAs(response.data, fileName);
     } catch (error) {
       console.error('Error during file download:', error);
     }
   };
 
-  const handleShowAllFiles = () => {
-    setShowAllFiles(!showAllFiles);
-  };
+  const AdditionalContent = () => (
+    <>
+      <Paper
+        elevation={6}
+        style={{ padding: '20px', border: '3px solid black' }}
+      >
+        <Typography variant="h6">List of Uploaded Files:</Typography>
+        <List>
+          {uploadedFiles.map((fileName, index) => (
+            <ListItem key={index}>
+              <ListItemText primary={fileName} />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  aria-label="download"
+                  onClick={() => handleDownload(fileName)}
+                >
+                  <DownloadIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+    </>
+  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -200,7 +222,7 @@ export default function FileUpload() {
                   mt: 3,
                   mb: 2,
                   borderRadius: 2,
-                  backgroundColor: '#CBB780FF',
+                  backgroundColor: '#CBB780FF', // Couleur or
                 }}
               >
                 Upload File
@@ -223,44 +245,28 @@ export default function FileUpload() {
             {snackbarMessage}
           </Alert>
         </Snackbar>
-        <Typography
-          variant="h6"
-          style={{ marginTop: '20px', marginBottom: '10px' }}
-        >
-          List of Uploaded Files:
-        </Typography>
-        <List>
-          {uploadedFiles.map((fileName, index) => (
-            <ListItem key={index}>
-              <ListItemText primary={fileName} />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  aria-label="download"
-                  onClick={() => handleDownload(fileName)}
-                >
-                  <DownloadIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
         <Button
           variant="contained"
           color="primary"
           fullWidth
-          onClick={handleShowAllFiles}
-          sx={{ mt: 2, mb: 2 }}
+          onClick={
+            showAllFiles
+              ? () => setShowAllFiles(false)
+              : () => setShowAllFiles(true)
+          }
+          sx={{
+            mt: 2,
+            mb: 2,
+            backgroundColor: '#CBB780FF',
+            border: '2px solid black',
+            '&:hover': {
+              backgroundColor: 'green', // Vert lors du survol
+            },
+          }}
         >
           {showAllFiles ? 'Hide All Files' : 'Show All Files'}
         </Button>
-        {showAllFiles && (
-          <>
-            <Divider sx={{ my: 2 }} />
-            {/* Assuming there is a separate list or some other content to show when 'showAllFiles' is true */}
-            {/* Add that content here */}
-          </>
-        )}
+        {showAllFiles && <AdditionalContent />}
       </Container>
     </ThemeProvider>
   );

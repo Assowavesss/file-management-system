@@ -48,7 +48,7 @@ const uploadFile = async (req, res) => {
     const newDocument = await prisma.document.create({
       data: {
         fileName: originalFileName,
-        filePath: req.file.path,
+        filePath: req.file.destination,
         fileType: req.file.mimetype,
         fileSize: req.file.size,
         documentType: documentType,
@@ -81,7 +81,13 @@ const uploadFile = async (req, res) => {
 // Fonction pour obtenir la liste de tous les fichiers
 const getAllFiles = async (req, res) => {
   try {
-    const files = await prisma.document.findMany();
+    console.log(req.params.internshipId);
+    const files = await prisma.document.findMany({
+      where: {
+        filePath: `uploads/${req.params.internshipId}`
+      }
+    });
+    console.log(files);
     const fileNames = files.map((file) => file.fileName);
     res.json(fileNames);
   } catch (error) {

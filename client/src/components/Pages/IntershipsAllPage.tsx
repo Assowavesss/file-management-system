@@ -46,6 +46,7 @@ interface Internship {
 export default function AllInternships() {
   const [internships, setInternships] = useState<Internship[]>([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     axios
       .get('http://localhost:8080/internships')
@@ -123,12 +124,26 @@ export default function AllInternships() {
               <TableRow key={internship.id}>
                 <TableCell>{internship.title}</TableCell>
                 <TableCell>{internship.description}</TableCell>
-                <TableCell>{internship.startDate}</TableCell>
-                <TableCell>{internship.endDate}</TableCell>
+                <TableCell>
+                  {new Date(internship.startDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  {new Date(internship.endDate).toLocaleDateString()}
+                </TableCell>
                 <TableCell>{internship.salary}</TableCell>
                 <TableCell>
                   {internship.student
                     ? `${internship.student.user.firstName} ${internship.student.user.lastName}`
+                    : 'Chargement...'}
+                </TableCell>
+                <TableCell>
+                  {internship.company
+                    ? internship.company.name
+                    : 'Chargement...'}
+                </TableCell>
+                <TableCell>
+                  {internship.tutor
+                    ? `${internship.tutor.user.firstName} ${internship.tutor.user.lastName}`
                     : 'Chargement...'}
                 </TableCell>
                 <TableCell>

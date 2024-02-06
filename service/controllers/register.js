@@ -41,9 +41,7 @@ const registerUser = async (req, res) => {
         },
       });
       
-      if(!checkAdmin) {
-        return res.status(404).json({message: "You're not the admin"});
-      }
+     
       
       const alreadyExistsUser = await prisma.user.findFirst({
         where: {

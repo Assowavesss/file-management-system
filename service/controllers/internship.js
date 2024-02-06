@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
@@ -112,12 +112,27 @@ const updateInternships = async (req, res) => {
   }
 }
 
-const getAllInternships = async (req, res) => {
+const getAllInternships = async (_, res) => {
   try {
-    // Récupérer la liste de toutes les internships depuis la base de données
-    const internships = await prisma.internship.findMany();
-
-    // Envoyer la liste en réponse sous forme de JSON
+    
+    const internships = await prisma.internship.findMany({
+      
+        include: {
+  
+          student: {
+      // Envoyer la liste en réponse sous forme de JSON
+            include: {
+              user: true
+            }
+          },
+          company: true,
+          tutor: {
+            include: {
+              user: true
+            }
+          }
+        }
+      });
     res.status(200).json(internships);
   } catch (error) {
     console.error(error);

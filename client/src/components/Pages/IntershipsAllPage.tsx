@@ -128,7 +128,7 @@ export default function AllInternships() {
                 <TableCell>{internship.salary}</TableCell>
                 <TableCell>
                   {internship.student
-                    ? `${internship.student.firstName} ${internship.student.lastName}`
+                    ? `${internship.student.user.firstName} ${internship.student.user.lastName}`
                     : 'Chargement...'}
                 </TableCell>
                 <TableCell>{internship.company.name}</TableCell>

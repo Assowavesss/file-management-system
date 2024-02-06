@@ -55,22 +55,7 @@ const uploadFile = async (req, res) => {
       },
     });
 
-    if (documentType === 'CdC') {
-      const cdc = await prisma.cdC.create({
-        data: {
-          documentId: document.id,
-          fileName: originalFileName,
-        },
-      });
-    } else if (documentType === 'RapportDeStage') {
-      await prisma.report.create({
-        data: {
-          documentId: document.id,
-          fileName: originalFileName,
-        },
-      });
-    }
-
+    
     res.send('File uploaded successfully');
   } catch (error) {
     console.error(error);

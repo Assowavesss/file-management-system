@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { UserContext } from '../../../UserContext';
 import { AppBar, Box, Button, IconButton, Stack, Toolbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-
+import logo from '../../assets/logo.png';
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, handleUserLogout } = useContext(UserContext);
@@ -88,6 +88,11 @@ const Navbar = () => {
           >
             <MenuIcon />
           </IconButton>
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ maxWidth: 120, marginRight: '10px' }}
+          />
           <Stack
             direction="row"
             spacing={2}

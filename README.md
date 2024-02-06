@@ -18,8 +18,7 @@ For service side :
 
 ```bash
   npm install
-  npx prisma generate
-  npx prisma db push
+  npx run prisma
   npm start
 
 ```

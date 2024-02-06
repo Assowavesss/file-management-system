@@ -1,9 +1,18 @@
 import multer from 'multer';
+import fs from 'fs';
 import path from 'path';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/')
+    
+    const subdirectory = `uploads/${req.params.internshipId}`;
+
+    // Vérifier si le répertoire existe, sinon le créer
+    if (!fs.existsSync(subdirectory)) {
+      fs.mkdirSync(subdirectory, { recursive: true });
+    }
+
+    cb(null, subdirectory);
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname)

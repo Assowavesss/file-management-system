@@ -131,9 +131,6 @@ export default function AllInternships() {
                     ? `${internship.student.user.firstName} ${internship.student.user.lastName}`
                     : 'Chargement...'}
                 </TableCell>
-
-                <TableCell>{internship.company.name}</TableCell>
-                <TableCell>{`${internship.tutor.user.firstName} ${internship.tutor.user.lastName}`}</TableCell>
                 <TableCell>
                   <Button
                     variant="contained"

@@ -54,7 +54,6 @@ const createInternship = async (req, res) => {
       },
     });
 
-
     console.log(studentId);
     const internship = await prisma.internship.create({
       data: {
@@ -76,31 +75,54 @@ const createInternship = async (req, res) => {
   }
 };
 
-
-const getAllInternships = async (_, res) => {
+const updateInternships = async (req, res) => {
+  const body = req.body;
+  
+  console.log('Extracted JWT token:', req.headers.authorization.split(' ')[1]);
+  console.log('Request Body:', req.body);
+  
+  const token = req.headers.authorization.split(' ')[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const tutorId = decoded.id;
+  
   try {
-    const internships = await prisma.internship.findMany({
-      include: {
-        student: {
-          include: {
-            user: true
-          }
-        },
-        company: true,
-        tutor: {
-          include: {
-            user: true
-          }
-        }
+    
+    const tutorFound = await prisma.tutor.findUnique({
+      where: {
+        id: tutorId
       }
     });
+
+    if(!tutorFound) {
+      return res.status(404).json({message: "you're not the tutor"});
+    }
+    
+    const internships = await prisma.internship.update({
+      data: {
+        body
+      }
+    })
+
+    return res.json({message: "internship updated"});
+
+  }catch(error)
+  {
+    console.error(error);
+    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+  }
+}
+
+const getAllInternships = async (req, res) => {
+  try {
+    // Récupérer la liste de toutes les internships depuis la base de données
+    const internships = await prisma.internship.findMany();
+
+    // Envoyer la liste en réponse sous forme de JSON
     res.status(200).json(internships);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erreur interne du serveur.' });
+    return res.status(500).json({ error: 'Erreur interne du serveur.' });
   }
-
 };
-
 
 export { createInternship,getAllInternships };

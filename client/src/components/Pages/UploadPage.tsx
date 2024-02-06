@@ -29,7 +29,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 const theme = createTheme();
 
 export default function FileUpload() {
-  const { productId } = useParams();
+  const { internshipId } = useParams();
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<string>('');
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -39,8 +39,8 @@ export default function FileUpload() {
 
   useEffect(() => {
     loadFiles();
-    console.log(productId);
-  }, [productId]);
+    console.log(internshipId);
+  }, [internshipId]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files ? e.target.files[0] : null;
@@ -62,9 +62,13 @@ export default function FileUpload() {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('documentType', documentType);
+    formData.append('internshipId', '1');
 
     try {
-      await axios.post('http://localhost:8080/api/v1/upload', formData);
+      await axios.post(
+        `http://localhost:8080/api/v1/upload/${internshipId}`,
+        formData
+      );
       setSnackbarMessage('File uploaded successfully!');
       setOpenSnackbar(true);
       loadFiles();

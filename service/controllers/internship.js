@@ -48,7 +48,14 @@ const createInternship = async (req, res) => {
       }
     });
 
-    console.log(tutor.userId);
+    const student = await prisma.student.findUnique({
+      where: {
+        userId: studentId
+      },
+    });
+
+
+    console.log(studentId);
     const internship = await prisma.internship.create({
       data: {
         title: req.body.internshipTitle,
@@ -58,7 +65,7 @@ const createInternship = async (req, res) => {
         salary: parseInt(req.body.internshipSalary, 10),
         companyId: company.id,
         tutorId: tutor.id,
-        studentId: studentId,
+        studentId: student.id,
       },
     });
 

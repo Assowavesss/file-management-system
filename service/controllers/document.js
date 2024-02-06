@@ -42,10 +42,9 @@ const uploadFile = async (req, res) => {
     ) {
       return res.status(400).send('Invalid document type.');
     }
-    
-
+  
     const originalFileName = req.file.originalname;
-
+    console.log(req.file);
     const newDocument = await prisma.document.create({
       data: {
         fileName: originalFileName,

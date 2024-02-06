@@ -1,8 +1,25 @@
+# InternshipManagement project
 
+A brief description of what this project does and who it's for
 
+## Installation
 
+Install my-project with npm
 
+For client side :
 
+```bash
+  npm install
+  npm run dev
 
+```
 
-# file-management-system
+For service side :
+
+```bash
+  npm install
+  npx prisma generate
+  npx prisma db push
+  npm start
+
+```

@@ -112,7 +112,9 @@ export default function FileUpload() {
 
   const loadFiles = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/v1/allfiles'); // Utilisation de la bonne URL
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/allfiles/${internshipId}`
+      ); // Utilisation de la bonne URL
       setUploadedFiles(response.data);
     } catch (error) {
       console.error('Error loading files:', error);

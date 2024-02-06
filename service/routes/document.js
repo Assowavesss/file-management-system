@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/upload/:internshipId', upload.single('file'), documentController.uploadFile);
 
 // Route pour obtenir la liste de tous les fichiers
-router.get('/allfiles', documentController.getAllFiles);
+router.get('/allfiles/:internshipId', documentController.getAllFiles);
 
 // Route pour télécharger un fichier spécifique par son nom
 router.get('/download/:fileName', documentController.downloadFile);

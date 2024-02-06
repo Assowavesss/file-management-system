@@ -49,6 +49,9 @@ const Navbar = () => {
         buttons.push(
           <Button component={Link} to="/internship" key="internship">
             Internship
+          </Button>,
+          <Button component={Link} to="/all-internships" key="all-internships">
+            All Internships
           </Button>
         );
       } else if (user.role === 'Tutor') {

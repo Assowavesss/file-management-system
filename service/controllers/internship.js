@@ -79,15 +79,28 @@ const createInternship = async (req, res) => {
 
 const getAllInternships = async (req, res) => {
   try {
-    // Récupérer la liste de toutes les internships depuis la base de données
-    const internships = await prisma.internship.findMany();
-
-    // Envoyer la liste en réponse sous forme de JSON
+    const internships = await prisma.internship.findMany({
+      include: {
+        student: {
+          include: {
+            user: true
+          }
+        },
+        company: true,
+        tutor: {
+          include: {
+            user: true
+          }
+        }
+      }
+    });
     res.status(200).json(internships);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    res.status(500).json({ error: 'Erreur interne du serveur.' });
   }
+
 };
+
 
 export { createInternship,getAllInternships };

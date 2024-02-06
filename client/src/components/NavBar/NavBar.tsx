@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { UserContext } from '../../../UserContext';
 import { AppBar, Box, Button, IconButton, Stack, Toolbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-
+import logo from '../../assets/logo.png';
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, handleUserLogout } = useContext(UserContext);
@@ -18,51 +18,56 @@ const Navbar = () => {
           Login
         </Button>
       );
-    } else if (user.role === 'Admin') {
-      // Utilisateur connecté en tant qu'Admin
-      return (
-        <>
-          <Button component={Link} to="/register">
+    } else {
+      // Utilisateur connecté, afficher le bouton Profile
+      const buttons = [
+        <Button
+          variant={'contained'}
+          component={Link}
+          to="/profile"
+          key="profile"
+        >
+          Profile
+        </Button>,
+      ];
+
+      if (user.role === 'Admin') {
+        // Ajouter les boutons pour l'Admin
+        buttons.push(
+          <Button component={Link} to="/register" key="register">
             Register
+          </Button>,
+          <Button component={Link} to="/internship" key="internship">
+            Internship
+          </Button>,
+          <Button component={Link} to="/all-internships" key="all-internships">
+            All Internships
           </Button>
-          <Button component={Link} to="/internship">
+        );
+      } else if (user.role === 'Student') {
+        // Ajouter le bouton pour l'Étudiant
+        buttons.push(
+          <Button component={Link} to="/internship" key="internship">
             Internship
           </Button>
-          <Button component={Link} to="/all-internships">
+        );
+      } else if (user.role === 'Tutor') {
+        // Ajouter le bouton pour le Tuteur
+        buttons.push(
+          <Button component={Link} to="/all-internships" key="all-internships">
             All Internships
           </Button>
-          <Button variant="contained" onClick={handleUserLogout}>
-            Sign out
-          </Button>
-        </>
+        );
+      }
+
+      // Ajouter le bouton de déconnexion pour tous les utilisateurs connectés
+      buttons.push(
+        <Button variant="contained" onClick={handleUserLogout} key="signout">
+          Sign out
+        </Button>
       );
-    } else if (user.role === 'Student') {
-      // Utilisateur connecté en tant qu'Étudiant
-      return (
-        <>
-          <Button component={Link} to="/internship">
-            Internship
-          </Button>
-          <Button component={Link} to="/all-internships">
-            All Internships
-          </Button>
-          <Button variant="contained" onClick={handleUserLogout}>
-            Sign out
-          </Button>
-        </>
-      );
-    } else if (user.role === 'Tutor') {
-      // Utilisateur connecté en tant que Tuteur
-      return (
-        <>
-          <Button component={Link} to="/all-internships">
-            All Internships
-          </Button>
-          <Button variant="contained" onClick={handleUserLogout}>
-            Sign out
-          </Button>
-        </>
-      );
+
+      return buttons;
     }
   };
 
@@ -83,6 +88,11 @@ const Navbar = () => {
           >
             <MenuIcon />
           </IconButton>
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ maxWidth: 120, marginRight: '10px' }}
+          />
           <Stack
             direction="row"
             spacing={2}

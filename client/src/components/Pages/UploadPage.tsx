@@ -62,9 +62,13 @@ export default function FileUpload() {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('documentType', documentType);
+    formData.append('internshipId', '1');
 
     try {
-      await axios.post('http://localhost:8080/api/v1/upload', formData);
+      await axios.post(
+        `http://localhost:8080/api/v1/upload${productId}`,
+        formData
+      );
       setSnackbarMessage('File uploaded successfully!');
       setOpenSnackbar(true);
       loadFiles();
